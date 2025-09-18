@@ -269,7 +269,10 @@ public class FileController {
                     return;
                }
 
+               // get the path
                String path = exchange.getRequestURI().getPath();
+
+               // get the port number from path
                String portStr = path.substring(path.lastIndexOf('/') + 1);
 
                try {
@@ -282,11 +285,12 @@ public class FileController {
                          String filename = "downloaded-file"; // Default filename
 
                          try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                              byte[] buffer = new byte[4096];
+                              byte[] contentBuffer = new byte[4096];
                               int bytesRead;
 
                               ByteArrayOutputStream headerBaos = new ByteArrayOutputStream();
                               int b;
+                              // read all the contents from socket and put it to BAOS
                               while ((b = socketInput.read()) != -1) {
                                    if (b == '\n')
                                         break;
@@ -298,8 +302,8 @@ public class FileController {
                                    filename = header.substring("Filename: ".length());
                               }
 
-                              while ((bytesRead = socketInput.read(buffer)) != -1) {
-                                   fos.write(buffer, 0, bytesRead);
+                              while ((bytesRead = socketInput.read(contentBuffer)) != -1) {
+                                   fos.write(contentBuffer, 0, bytesRead);
                               }
                          }
 
